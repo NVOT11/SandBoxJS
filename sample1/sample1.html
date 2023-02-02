@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sample1</title>
+  <script>
+    "use strict";
+    let context;  // 描画コンテキスト
+    let score = 0;  // スコア
+    let prob = 0.96;   // 落下確率
+    let basketX = 0;  // カゴX座標
+    let timerId = NaN;  // タイマーID
+    let basket, chick, egg1, egg2;  // 各種画像
+    let items = [];  // タマゴの配列
+    let back; // 背景画像
+
+    onload = function () {
+      context = document.getElementById("field").getContext("2d");
+      context.font = "32px 'Times New Roman'";
+      basket = document.getElementById("basket");
+      chick = document.getElementById("chick");
+      egg1 = document.getElementById("egg1");
+      egg2 = document.getElementById("egg2");
+      back = document.getElementById("back");
+
+      // 50msごとにtickを呼ぶ
+      timerId = setInterval(tick, 50);
+      window.onmousemove = (e) => {
+        // マウスX座標をカゴの座標に反映
+        basketX = e.clientX;
+      };
+    };
+
+    function tick() {
+      // 背景描画
+      context.drawImage(back, 0, 0);
+      // マウスX座標に合わせてカゴを描画
+      context.drawImage(basket, basketX - 50, 500);
+      // 一定確率で卵を追加 x=0-500,y=1
+      if (Math.random() > prob) {
+        let x = Math.random() * 500;
+        let y = 1;
+        items.push({ x: x, y: y });
+      }
+
+      // - キャッチ判定 -
+      // タマゴの数を取得
+      let prev = items.length;
+      // 配列からカゴの近くにないタマゴのみ取り出す
+      items = items.filter((e) => {
+        return (
+          e.y < 400 || e.y > 600 || e.x < basketX - 50 || e.x > basketX + 50
+        );
+      });
+      // タマゴの数が変化＝キャッチしたとみなす
+      if (prev != items.length) {
+        score++;
+        prob -= 0.001;
+      }
+
+      // スコア標示
+      context.fillStyle = "green";
+      context.fillText("Score:" + score, 400, 250);
+
+      // 卵に対する処理
+      items.forEach((e) => {
+        // Y座標を増加
+        e.y += e.y * 0.1;
+
+        if (e.y < 50) {
+          // y:0～50の時はニワトリを表示
+          context.drawImage(chick, e.x, 10);
+        } else {
+          // y:50～の時はタマゴを表示
+          context.drawImage(egg1, e.x, e.y);
+        }
+
+        // 潰れた卵を表示
+        if (e.y > 550) {
+          context.drawImage(egg2, e.x - 50, 500);
+        }
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <canvas id="field" width="600" height="600"></canvas>
+  <img id="basket" src="basket.png" style="display: none">
+  <img id="chick" src="chick.png" style="display: none">
+  <img id="egg1" src="egg1.png" style="display: none">
+  <img id="egg2" src="egg2.png" style="display: none">
+  <img src="back.png" id="back" style="display: none">
+</body>
+
+</html>
