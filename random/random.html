@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>RandomValue</title>
+  <script>
+    function calc() {
+      let total = Math.random();
+      document.getElementById("rand").textContent = total;
+    }
+  </script>
+</head>
+
+<body>
+  <button onclick="calc()">CLICK</button>
+  <h2>Random<span id="rand"></span></h2>
+</body>
+
+</html>
